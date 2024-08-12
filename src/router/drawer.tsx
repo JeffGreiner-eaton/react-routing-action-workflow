@@ -30,8 +30,11 @@ export const NavigationDrawer: React.FC = () => {
                     setDrawerOpen(false);
                 },
             }}
-            variant={isMobile ? 'temporary' : 'persistent'}
+            variant={'permanent'}
             activeItem={selected}
+            placeholder={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
         >
             <DrawerHeader
                 title={'Brightlayer UI'}
@@ -40,8 +43,11 @@ export const NavigationDrawer: React.FC = () => {
                 onIconClick={(): void => {
                     setDrawerOpen(!drawerOpen);
                 }}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
             />
-            <DrawerBody>
+            <DrawerBody placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                 <DrawerNavGroup
                     items={PAGES.map((page) => {
                         const Icon = page.icon;
@@ -59,6 +65,9 @@ export const NavigationDrawer: React.FC = () => {
                         };
                     })}
                     hidePadding
+                    placeholder={undefined}
+                    onPointerEnterCapture={undefined}
+                    onPointerLeaveCapture={undefined}
                 />
             </DrawerBody>
         </Drawer>
