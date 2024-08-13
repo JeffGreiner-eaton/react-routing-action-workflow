@@ -23,11 +23,9 @@ git clone https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
 ![workflow-name](./images/workflow-name.png)
 
 -   In the next section of the .yml workflow file we will setup the `on:` trigger events that will trigger the workflow to run. For Brightlayer-UI we tend to use three event types:
-- ` on: push:`
-- ` on: pull_request:`
-- ` on: pull_request_target:`
+- ` on: push:` ` on: pull_request:` ` on: pull_request_target:`
 
--   On line 3 add the key `on:` and event types.
+-   On line 3 add the `on:` key and event types.
 ```yaml
 on:
   push:
@@ -46,6 +44,21 @@ See the office docs [here](https://docs.github.com/en/actions/writing-workflows/
 -   The workflow .yml file is now setup with run name and on: trigger event types.
 
 ![triggers](./images/triggers.png)
+
+-   In the next section of the workflow, assigning permissions for jobs. You can use permissions to modify the default permissions granted by Github and you can use permissions either as a top-level key, to apply to all jobs in the workflow, or within specific jobs. For Brightlayer-UI we tend to use this permission setup for the `on:` key event type `pull_request_target` and permits forked pull requests to run our workflow and jobs.
+
+-   On line 14 add the `permissions:` key and the types.
+```yaml
+permissions:
+  pull-requests: write
+  contents: read
+```
+
+See the office docs [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/assigning-permissions-to-jobs) for additional permission types.
+
+![permissions](./images/permissions.png)
+
+-   The last section of the .yml workflow file is the jobs section. This section is where we define what actions will run when the workflow is triggered. For this repository the jobs section will contain the checkoutout actions and the commands to run prettier, lint, build and test that are referenced in package.json.
 
 # Getting Started with Create React App
 
