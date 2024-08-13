@@ -22,7 +22,7 @@ git clone https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
 
 ![workflow-name](./images/workflow-name.png)
 
--   In the next section of the .yml workflow file we will setup the `on:` trigger events that will trigger the workflow to run. For Brightlayer-UI we tend to use three event types:
+-   In the next section of the .yml workflow file we will setup the `on:` key trigger events that will trigger the workflow to run. For Brightlayer-UI we tend to use three event types:
 ` on: push:` ` on: pull_request:` ` on: pull_request_target:`
 
 -   On line 3 add the `on:` key and event types.
@@ -45,7 +45,7 @@ See the official docs [here](https://docs.github.com/en/actions/writing-workflow
 
 ![triggers](./images/triggers.png)
 
--   In the next section of the workflow, assigning permissions for jobs. You can use permissions to modify the default permissions granted by Github and you can use permissions either as a top-level key, to apply to all jobs in the workflow, or within specific jobs. For Brightlayer-UI we tend to use this permission setup for the `on:` key event type `pull_request_target` and permits forked pull requests to run our workflow and jobs.
+-   In the next section of the workflow, assigning permissions for jobs. You can use permissions to modify the default permissions granted by Github and you can use permissions either as a top-level key, to apply to all jobs in the workflow, or within specific jobs. For Brightlayer-UI we use top-level key permissions and tend to use this permission setup for the `on:` key event type `pull_request_target` and permits forked pull requests to run our workflow and jobs.
 
 -   On line 14 add the `permissions:` key and the types.
 ```yaml
@@ -191,36 +191,57 @@ See the `actions/upload-artifact` repository readme [here](https://github.com/ac
 
 -   Commit and push the job to your open pull request. Verify the workflow run and job from the actions tab in the repository. Select the build workflow job from the left nav to view all the job folders, then scroll to the bottom of the page to verify the `actions/upload-artifact` saved the build folder. Double click on the build_project job folder to view the contents of the job details.
 
-![build-project](./images/build-project.png)     
+![build-project](./images/build-project.png)
 
+# Github Actions & Workflows Continued
+## Publishing packages to NPM (@brightlayer-ui)
 
-# Getting Started with Create React App
+The publish step in a workflow is another job that can be added if you have a node package to publish to NPM.
+-   This can be the last job in a workflow and it should contain the `needs:` key that sets the publish job not to run until all other important jobs complete and pass the checks. The `needs:` key is an array of the job names within the workflow. Example `needs: [prettier_lint, unit_test, build_project]`
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+-   The publish job also contains an `if:` key as a conitional run type based on the `github.ref (master or dev branch)` push events. In a job the if condition is set like this `if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev') }}`. 
+-   Key information for brightlayer-ui publishing:
+    - The `dev` branch will publish versions marked as `alpha` or `beta`.
+    - The `master` branch will publish any version (`alpha`, `beta`, or `latest`).
+    In both cases, the code will only be published if the version number differs from the current version published under the respective dist tag.
 
-## Available Scripts
+-   The repository projects package.json scripts section will need updated if it does not contain the `publish:package` Example: `"publish:package": "cd dist && rm -f *.tgz && set npm_config_yes=true && npx -p @brightlayer-ui/publish blui-publish"`. Modify the directory needed for the dist/build folder.
 
-In the project directory, you can run:
+-   The job will also utilize `secrets.NPM_TOKEN` within a `env:` key that the job will use to pass authentication over to NPM via a token to complete the publishing. The repository needs to know about the NPM_TOKEN in the repository settings and actions. Navigate to the settings tab of the repository and expand secrets and variables and select actions. The NPM token is available in the teams adminstration file.
 
-### `yarn start`
+![repo-security](./images/repo-security.png)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+![repo-secrets](./images/repo-secrets.png)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## The publish job
 
-### `yarn test`
+```yaml
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev') }}
+    needs: build_library
+    strategy:
+      matrix:
+        node-version: [18.x]
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      BRANCH: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download dist
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn --immutable
+      - run: npm run publish:package -- -b ${{env.BRANCH}}
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Modifications and information
+-   Update download dist name and path based on the output for given project. (build or dist)
+-   The `run: yarn --immutable` --immutable is the same as frozen lock.
+-   The `matrix: node-version: [18.x]` use only one version of node for publish.
