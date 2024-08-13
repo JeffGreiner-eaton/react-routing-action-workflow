@@ -130,13 +130,68 @@ See the `run` key docs [here](https://docs.github.com/en/actions/writing-workflo
 -   The prettier_lint job and steps are complete and should look like this.
 ![prettier-job](./images/prettier-job.png)
 
--   This is the opportunity to check the workflow and job runs in your repository. Open a new pull request in your new repository. Once your PR is open, select the actions tab in the repository. Verify your new workflow name (Build) is reflected in the left side-nav and select it. Verify the prettier_lint job is listed and complete. Double click the job folder to view the content of the run. Note: if the job failed, double click on it to see error.
+-   This is the opportunity to see if the workflow and job runs in your repository. Open a new pull request in your new repository. Once your PR is open, select the actions tab in the repository. Verify your new workflow name (Build) is reflected in the left side-nav and select it. Verify the prettier_lint job is listed and complete. Double click the job folder to view the content of the run. Note: if the job failed, double click on it to see error.
 
 ![action-prettier-job](./images/action-prettier.png)
 
 ![prettier-flow](./images/prettier-flow.png)
 
-     
+-   Add the unit_test job below the prettier_lint job. The setup for this job is similar to the prettier_lint job. Re-use the prettier_lint job and copy/paste. Modify the job name and `run:` keys for testing.
+
+```yaml
+  unit_test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+    - run: yarn
+    - run: yarn test --watchAll=false
+```
+-   Commit and push the job to your open pull request. Verify the workflow run and job from the actions tab in the repository. Double click on the unit_test job folder to view the contents.
+
+![unit-test-job](./images/unit-test-job.png)
+
+-   Add the build job below the unit_test job. The setup for this job is similar to the unit_test job. Re-use the unit_test job and copy/paste it below the unit_test job. Modify the job name and `run:` keys for build_project. In this job we add another action called `actions/upload-artifact` and this action will upload the build or dist folder to the artifacts section of the workflow run.
+
+See the `actions/upload-artifact` repository readme [here](https://github.com/actions/upload-artifact).
+
+```yaml
+  build_project:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+    - run: yarn
+    - run: yarn build
+    - name: Save build
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        if-no-files-found: error
+        path: build
+```
+
+-   Commit and push the job to your open pull request. Verify the workflow run and job from the actions tab in the repository. Select the build workflow job from the left nav to view all the job folders, then scroll to the bottom of the page to verify the `actions/upload-artifact` saved the build folder. Double click on the build_project job folder to view the contents of the job details.
+
+![build-project](./images/build-project.png)     
 
 
 # Getting Started with Create React App
