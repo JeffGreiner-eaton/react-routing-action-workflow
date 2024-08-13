@@ -1,8 +1,8 @@
-# Github Actions & Workflows
+# Github Actions & Workflows (BLUI)
 ## Build and Test with Node.js
 ### See the official doc [here](https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs).
 
-This repository contains the Brightlayer-UI React Routing template starter project and is the starting point for experimenting with Github Actions & Workflows. For this projects continuous integration (CI) we will focus only on the actions / workflow and the available scripts in package.json.
+This repository contains the Brightlayer-UI React Routing template starter project and is the starting point for experimenting with basic Github Actions & Workflows. For this projects continuous integration (CI) we will focus only on the actions / workflow and the available scripts in package.json.
 
 There are two ways to implement the (CI) .yml file for any project in github, the first way is to create and edit the workflow .yml file in the actions tab in the repository and the second way is to commit & push the .yml file. For this we will just commit the .yml in to your new repository via a pull request and the workflow will be triggered to run once everything is setup.
 
@@ -18,7 +18,7 @@ git clone https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
 ![github-folder](./images/github-folder.png)
 
 -   To help author the .yml you can install the VS Code extension GitHub Actions v0.26.X
--   In the new .yml file, the first line will contain the workflow name and will be displayed in the github repository actions once the first workflow runs. On your first line of the .yml add ``` name: Build ```
+-   In the new .yml file, the first line will contain the workflow name that will be displayed in the github repository actions once the first workflow runs. On the first line of the .yml add ``` name: Build ```. The name value can be anything to represent what the workflow is.
 
 ![workflow-name](./images/workflow-name.png)
 
@@ -97,7 +97,7 @@ jobs:
 ```
 ![step-checkout](./images/step-checkout.png)
 
-See the actions/checkout repository readme [here](https://github.com/actions/checkout) for more information.
+See the `actions/checkout` repository readme [here](https://github.com/actions/checkout) for more information.
 
 See the uses key official docs [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_iduses).
 
@@ -113,7 +113,7 @@ See the uses key official docs [here](https://docs.github.com/en/actions/writing
 ```
 ![step-setup](./images/step-setup.png)
 
-See the actions/setup-node repository readme [here](https://github.com/actions/setup-node).
+See the `actions/setup-node` repository readme [here](https://github.com/actions/setup-node).
 
 - The job steps setup section should look like the image above and now the job has been defined to use actions/checkout with actions/setup-node using the value from the matrix with cache of yarn. Cache yarn at the time of testing workflows seemed to speed job runs a bit but isn't always needed.
 
