@@ -219,7 +219,7 @@ The publish step in a workflow is another job that can be added if you have a no
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev') }}
-    needs: build_library
+    needs: [prettier_lint, unit_test, build_project]
     strategy:
       matrix:
         node-version: [18.x]
