@@ -1,6 +1,6 @@
 # Github Actions & Workflows
 ## Build and Test with Node.js
-### See the offical doc [here](https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs).
+### See the official doc [here](https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs).
 
 This repository contains the Brightlayer-UI React Routing template starter project and is the starting point for experimenting with Github Actions & Workflows. For this projects continuous integration (CI) we will focus only on the actions / workflow and the available scripts in package.json.
 
@@ -23,7 +23,7 @@ git clone https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
 ![workflow-name](./images/workflow-name.png)
 
 -   In the next section of the .yml workflow file we will setup the `on:` trigger events that will trigger the workflow to run. For Brightlayer-UI we tend to use three event types:
-- ` on: push:` ` on: pull_request:` ` on: pull_request_target:`
+` on: push:` ` on: pull_request:` ` on: pull_request_target:`
 
 -   On line 3 add the `on:` key and event types.
 ```yaml
@@ -39,7 +39,7 @@ on:
       - '*/*'
 ```
 
-See the office docs [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#on) for additional event types.
+See the official docs [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#on) for additional event types.
 
 -   The workflow .yml file is now setup with run name and on: trigger event types.
 
@@ -54,11 +54,90 @@ permissions:
   contents: read
 ```
 
-See the office docs [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/assigning-permissions-to-jobs) for additional permission types.
+See the official docs [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/assigning-permissions-to-jobs) for additional permission types.
 
 ![permissions](./images/permissions.png)
 
--   The last section of the .yml workflow file is the jobs section. This section is where we define what actions will run when the workflow is triggered. For this repository the jobs section will contain the checkoutout actions and the commands to run prettier, lint, build and test that are referenced in package.json.
+-   The last section of the .yml workflow file is the jobs section. This section is where we define what actions will run when the workflow is triggered. For this repository the jobs section will contain the checkout action, setup-node action and the commands to run prettier, lint, build and test that are referenced in package.json.
+
+- On line 18 add the `jobs:` key and then the job id `prettier_lint:` with `runs-on:` key using ubuntu-latest.
+
+```yaml
+jobs:
+  prettier_lint:
+    runs-on: ubuntu-latest
+```
+
+-   The `runs-on:` key with image runner `ubuntu-latest` is used by GitHub Actions and is the hosted virtual environment offering a quicker, simpler way to run your workflows. <ins>Self-hosted</ins> runners are highly configurable way to run workflows in your own custom environment that would have to be maintained by the team.
+
+See the available hosted runners [here](https://github.com/actions/runner-images)
+
+-   In the jobs section, continue on line 22 and add the `strategy:` id key with the `matrix:` key using `node-version`. The matrix strategy lets you use variables in a single job definition to automatically create multiple job runs that are based on the combinations of the variables. In this setup we use node-version 18.X and you can add other versions of node that will trigger multiple runs. Example `node-version: [16.x, 18.x, 20.x]`
+
+See the official doc on matrix strategy [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy).
+
+```yaml
+jobs:
+  prettier_lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+```
+
+![strategy](./images/strategy.png)
+
+-   In the jobs section, continue on line 26 with the `steps:` key with `name:` id step name. This is the section where we define what the job will execute and using the `actions/checkout@v4` Github action that checks-out the repository under $GITHUB_WORKSPACE, so the workflow can be accessed. The `uses:` key id is the location and version of a reusable workflow file to run as the job.
+
+```yaml
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+```
+![step-checkout](./images/step-checkout.png)
+
+See the actions/checkout repository readme [here](https://github.com/actions/checkout) for more information.
+
+See the uses key official docs [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_iduses).
+
+
+-   In the jobs section, continue on line 29 and add another `name:` id step name with `uses:` key for Node.js and using the actions/setup-node@v4 with node version.
+
+```yaml
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+```
+![step-setup](./images/step-setup.png)
+
+See the actions/setup-node repository readme [here](https://github.com/actions/setup-node).
+
+- The job steps setup section should look like the image above and now the job has been defined to use actions/checkout with actions/setup-node using the value from the matrix with cache of yarn. Cache yarn at the time of testing workflows seemed to speed job runs a bit but isn't always needed.
+
+-   In the jobs section, continue on line 34 and add the `run:` key with yarn (install), line 35 add another `run:` key with yarn prettier and lastly add `run:` key with yarn lint.
+
+```yaml
+    - run: yarn
+    - run: yarn prettier
+    - run: yarn lint
+```
+
+See the `run` key docs [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrun)
+
+-   The prettier_lint job and steps are complete and should look like this.
+![prettier-job](./images/prettier-job.png)
+
+-   This is the opportunity to check the workflow and job runs in your repository. Open a new pull request in your new repository. Once your PR is open, select the actions tab in the repository. Verify your new workflow name (Build) is reflected in the left side-nav and select it. Verify the prettier_lint job is listed and complete. Double click the job folder to view the content of the run. Note: if the job failed, double click on it to see error.
+
+![action-prettier-job](./images/action-prettier.png)
+
+![prettier-flow](./images/prettier-flow.png)
+
+     
+
 
 # Getting Started with Create React App
 
