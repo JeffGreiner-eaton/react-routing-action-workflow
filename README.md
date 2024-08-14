@@ -241,6 +241,8 @@ The publish step in a workflow is another job that can be added if you have a no
       - run: npm run publish:package -- -b ${{env.BRANCH}}
 ```
 
+See the official docs [here](https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-nodejs-packages#introduction).
+
 ### Modifications and information
 -   Update download dist name and path based on the output for given project. (build or dist)
 -   The `run: yarn --immutable` --immutable is the same as frozen lock.
