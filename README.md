@@ -6,9 +6,9 @@ This repository contains the Brightlayer-UI React Routing template starter proje
 
 There are two ways to implement the (CI) .yml file for any project in github, the first way is to create and edit the workflow .yml file in the actions tab in the repository and the second way is to commit & push the .yml file. For this we will just commit the .yml in to your new repository via a pull request and the workflow will be triggered to run once everything is setup.
 
--   Clone this repository and <ins>create a new repository under your github profile.</ins>
+-   Fork this repository and <ins>create a new repository under your github profile.</ins>
 ```
-git clone https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
+https://github.com/JeffGreiner-eaton/react-routing-action-workflow.git
 
 ```
 -   Clone down your new repository that was created and in the root of the project create a hidden folder `.github`. After creating the .github folder create a sub-folder in the .github called `workflows`.
